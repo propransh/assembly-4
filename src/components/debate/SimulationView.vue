@@ -46,6 +46,7 @@
       </div>
     </div>
 
+    <SentimentChart :ticks="sentimentTicks" />
     <div class="live-feed">
       <p class="feed-label">Live feed</p>
       <div class="feed-messages">
@@ -61,6 +62,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as d3 from 'd3'
+import SentimentChart from './SentimentChart.vue'
 
 const props = defineProps({
   topic: { type: String, default: 'Should AI be regulated by governments?' },
@@ -74,6 +76,7 @@ const currentTick = ref(0)
 const paused = ref(false)
 const simulationDone = ref(false)
 const feedMessages = ref([])
+const sentimentTicks = ref([])
 
 const stanceColors = {
   for: '#1D9E75',
@@ -168,6 +171,12 @@ const runTick = () => {
   })
 
   updateNodeColors()
+  sentimentTicks.value.push({
+  tick: currentTick.value,
+  positive: agents.value.filter(a => a.stance === 'for').length / agents.value.length,
+  neutral: agents.value.filter(a => a.stance === 'neutral').length / agents.value.length,
+  negative: agents.value.filter(a => a.stance === 'against').length / agents.value.length
+})
 }
 
 const updateNodeColors = () => {
@@ -281,7 +290,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.sim-wrapper { display: flex; flex-direction: column; gap: 16px; height: 100vh; padding: 20px; background: #0a0a0a; box-sizing: border-box; }
+.sim-wrapper { display: flex; flex-direction: column; gap: 16px; padding: 20px; background: #0a0a0a; box-sizing: border-box; }
 .sim-header { display: flex; justify-content: space-between; align-items: flex-start; }
 .sim-topic { font-size: 16px; font-weight: 500; color: #fff; }
 .sim-status { font-size: 12px; color: #555; margin-top: 4px; }
@@ -289,7 +298,7 @@ onUnmounted(() => {
 .ctrl-btn { background: #111; border: 1px solid #2a2a2a; color: #aaa; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; }
 .tick-label { font-size: 12px; color: #333; }
 .sim-body { display: flex; gap: 16px; flex: 1; min-height: 0; }
-.network-svg { flex: 1; background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 16px; min-height: 500px; }
+.network-svg { flex: 1; background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 16px; height: 450px; }
 
 .agent-panel { width: 280px; background: #111; border: 1px solid #1e1e1e; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
 .panel-header { display: flex; align-items: center; gap: 10px; }

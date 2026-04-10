@@ -41,3 +41,5 @@ __screenshots__/
 .env 
 __pycache__/ 
 *.pyc 
+__pycache__/ 
+*.pyc 
